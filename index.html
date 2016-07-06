@@ -44,6 +44,8 @@ var keymovepower=0.55;
 var friction = 0.98;
 
 var mouse={};
+var ongoingTouches = new Array();
+
 
 function init() {
 	canvas.width  = width
@@ -156,9 +158,88 @@ document.onmousemove = function(e) {
 }
 
 //Bind touch to mouse
-  canvas.addEventListener("touchstart", document.onmousedown, false);
-  canvas.addEventListener("touchend", document.onmouseup, false);
-  canvas.addEventListener("touchmove", document.onmousemove, false);
+ canvas.addEventListener("touchstart", handleStart, false);
+  canvas.addEventListener("touchend", handleEnd, false);
+  // canvas.addEventListener("touchcanccanvas", handleCancel, false);
+  canvas.addEventListener("touchmove", handleMove, false);
+
+  function ongoingTouchIndexById(idToFind) {
+  for (var i = 0; i < ongoingTouches.length; i++) {
+    var id = ongoingTouches[i].identifier;
+    
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1;    // not found
+}
+
+function copyTouch(touch) {
+  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
+}
+
+function handleStart(evt) {
+  evt.preventDefault();  
+  var touches = evt.changedTouches;
+        
+  for (var i = 0; i < touches.length; i++) {
+    console.log("touchstart:" + i + "...");
+    ongoingTouches.push(copyTouch(touches[i])); 
+    mouse.down=true;
+	mouse.startx=touches[i].pageX;
+	mouse.starty=touches[i].pageY; 
+	mouse.x = touches[i].pageX;
+	mouse.y = touches[i].pageY;
+
+  }
+}
+function handleEnd(evt) {
+  evt.preventDefault();
+  var touches = evt.changedTouches;
+  document.onmouseup();
+
+  for (var i = 0; i < touches.length; i++) {
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+    if (idx >= 0) {
+      ongoingTouches.splice(idx, 1);  // remove it; we're done
+    } else {
+      console.log("can't figure out which touch to end");
+    }
+  }
+}
+
+function handleMove(evt) {
+  evt.preventDefault();
+  var el = document.getElementsByTagName("canvas")[0];
+  var ctx = el.getContext("2d");
+  var touches = evt.changedTouches;
+
+  for (var i = 0; i < touches.length; i++) {
+    // var color = colorForTouch(touches[i]);
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    if (idx >= 0) {
+  mouse.x = touches[i].pageX;
+  mouse.y = touches[i].pageY;
+
+      ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
+      console.log(".");
+    } else {
+      console.log("can't figure out which touch to continue");
+    }
+  }
+}
+
+function handleCancel(evt) {
+  evt.preventDefault();
+  console.log("touchcancel.");
+  var touches = evt.changedTouches;
+  
+  for (var i = 0; i < touches.length; i++) {
+    ongoingTouches.splice(i, 1);  // remove it; we're done
+  }
+}
+
 
 </script>
 </body>
