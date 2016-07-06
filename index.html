@@ -155,6 +155,11 @@ document.onmousemove = function(e) {
   mouse.y = e.clientY;
 }
 
+//Bind touch to mouse
+  canvas.addEventListener("touchstart", document.onmousedown, false);
+  canvas.addEventListener("touchend", document.onmouseup, false);
+  canvas.addEventListener("touchmove", document.onmousemove, false);
+
 </script>
 </body>
 </html>
