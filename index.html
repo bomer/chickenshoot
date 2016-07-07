@@ -25,6 +25,9 @@
 			border:1px;
 			text-align:center;
 		}
+		#canvas{
+			border:1px solid #000;
+		}
 	</style>
 	<style type="text/css">
     #warning-message { display: none; }
@@ -56,22 +59,30 @@ window.addEventListener('orientationchange', doOnOrientationChange);
     Please enable screen rotation and turn the device sideways to play!
 </div>
 	<div id="canvas-container">
-		<canvas id="canvas" width="200" height="100" style="border:0px">
+		<canvas id="canvas" width="200" height="100" >
 		</canvas>
 	</div>
 
 	<script>
 //0,0 is top left in Canvas
 var mobileRatio = 9/16;
-var height = window.innerHeight;
+var height = window.innerHeight-3;
 var width=height / (9/16) + 16;
 
 var player={};
 var gravity=.91/2;
 var keymovepower=0.55;
 var friction = 0.98;
+var blocks=[];
+var blockwidth = height*0.3;
+var blockheight = height*0.15;
+
+var levels=[
+{blocks:[{x:width/2,y:height/2}], goal:{x:width*0.8,y:height-height/10}}
+];
 
 var mouse={};
+var level=0;
 var ongoingTouches = new Array();
 
 function init() {
@@ -80,11 +91,14 @@ function init() {
 	canvas.height = height;
 	canvas.imageSmoothingEnabled = true;
 
-	player.x=width/2; //Init player
+	player.x=width/10; //Init player
 	player.y=80;
+	player.turnsLeft=5;
 	player.xspeed=0;
 	player.yspeed=0;
 	jumpCountdown=0;
+
+	//Level 0, turn this into something better down the line
 }
 
 function drawGame(){
@@ -96,14 +110,21 @@ function drawGame(){
 	ctx.stroke();
 	ctx.fill();
 
-	// //draw x/y
-	// var ctx = canvas.getContext("2d");
-	// ctx.font = "16px Arial";
-	// ctx.fillText("X: " + mouse.x,10,50);
-	// ctx.fillText("Y: " + mouse.y,10,70);
-	// ctx.fillText("sX: " + mouse.startx,10,90);
-	// ctx.fillText("sY: " + mouse.starty,10,110);
+	// //draw x/y	
+	ctx.font = "16px Arial";
+	ctx.fillText("Turns Left: " + player.turnsLeft,10,50);
+	//Draw Blocks
+	var currentlevel=levels[level];
+	for (var i = 0; i < levels[level].blocks.length; i++) {
+		// Create gradient
+		var block = levels[level].blocks[i];		
+		ctx.fillRect(block.x,block.y,blockwidth,blockheight);
+	}
 
+	//goal
+	ctx.fillStyle="#030";
+	ctx.fillRect(currentlevel.goal.x,currentlevel.goal.y,blockwidth,blockheight);
+	ctx.fillStyle="#000";
 	//Draw vector
 	if(mouse.down){
 		ctx.beginPath();
@@ -140,6 +161,29 @@ function updateGame(){
 		if(!player.jumpCountdown>0){
 			player.yspeed=0;
 			player.xspeed=0;
+		}
+	}
+
+	//
+	// block detection
+	//
+	var blocks=levels[level].blocks;
+	for (var i = 0; i < blocks.length; i++) {
+		var block = blocks[i];
+		//Player Hit Detection of blocks, only if jump is not on cooldown
+		if (jumpCountdown==0 && block.visibile!=false){
+			var xdif=player.x-block.x;
+			var ydif=player.y-block.y;				
+			if (xdif >= 0 && xdif <= blockwidth ){ //x and y hit
+				if (ydif>=0 &&  ydif <blockheight ){
+					// console.log("The y IS TRUE");
+					// player.yspeed=blockspeed;
+					// player.yspeed-= (9);
+					player.xspeed=-player.xspeed;
+					player.yspeed=-player.yspeed;
+					// jumpCountdown=30; //0.5 seconds
+				}
+			}
 		}
 	}
 
@@ -190,6 +234,7 @@ document.onmouseup = function() {
 	player.jumpCountdown=0;
 	player.xspeed+=(player.dx / 6 );
 	player.yspeed+=player.dy / 6;
+	player.turnsLeft--;
 
 	mouse.down=false;
 	mouse.startx=null;
