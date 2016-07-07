@@ -319,7 +319,7 @@ document.onmouseup = function() {
 	if (mouse.down){
 	player.jumpCountdown=0;
 
-	var maxSpeed = height*0.33;
+	var maxSpeed = height*0.55;
 	var hyp = player.dx * player.dx + player.dy*player.dy;
 	hyp = Math.sqrt(hyp);
 	var multiplier = maxSpeed/hyp;
