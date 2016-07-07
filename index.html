@@ -10,9 +10,11 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="HandheldFriendly" content="True">
 	<meta name="MobileOptimized" content="720">
-	<meta name="viewport" content="width=device-width, target-densitydpi=300dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+	<meta name="viewport" content="target-densitydpi=300dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 	<meta name="format-detection" content="telephone=no" />
-	<title>Game Name</title>
+	<link rel="manifest" href="/manifest.json">
+
+	<title>ChickenShoot</title>
 
 	<style>
 		html,body{
@@ -24,9 +26,35 @@
 			text-align:center;
 		}
 	</style>
+	<style type="text/css">
+    #warning-message { display: none; }
+    @media only screen and (orientation:portrait){
+        #canvas-container { display:none; }
+        #warning-message { display:block; }
+    }
+    @media only screen and (orientation:landscape){
+        #warning-message { display:none; }
+    }
+</style>
+
+<script>           
+  function doOnOrientationChange(){
+  	window.location.reload();
+  }
+  document.addEventListener("change", doOnOrientationChange);
+
+window.addEventListener('orientationchange', doOnOrientationChange);
+
+</script>
+
+
 </head>
 
 <body>
+
+<div id="warning-message">
+    Please enable screen rotation and turn the device sideways to play!
+</div>
 	<div id="canvas-container">
 		<canvas id="canvas" width="200" height="100" style="border:0px">
 		</canvas>
@@ -36,7 +64,7 @@
 //0,0 is top left in Canvas
 var mobileRatio = 9/16;
 var height = window.innerHeight;
-var width=height / (9/16);
+var width=height / (9/16) + 16;
 
 var player={};
 var gravity=.91/2;
@@ -47,7 +75,8 @@ var mouse={};
 var ongoingTouches = new Array();
 
 function init() {
-	canvas.width  = width
+	
+	canvas.width  = width;
 	canvas.height = height;
 	canvas.imageSmoothingEnabled = true;
 
@@ -67,13 +96,13 @@ function drawGame(){
 	ctx.stroke();
 	ctx.fill();
 
-	//draw x/y
-	var ctx = canvas.getContext("2d");
-	ctx.font = "16px Arial";
-	ctx.fillText("X: " + mouse.x,10,50);
-	ctx.fillText("Y: " + mouse.y,10,70);
-	ctx.fillText("sX: " + mouse.startx,10,90);
-	ctx.fillText("sY: " + mouse.starty,10,110);
+	// //draw x/y
+	// var ctx = canvas.getContext("2d");
+	// ctx.font = "16px Arial";
+	// ctx.fillText("X: " + mouse.x,10,50);
+	// ctx.fillText("Y: " + mouse.y,10,70);
+	// ctx.fillText("sX: " + mouse.startx,10,90);
+	// ctx.fillText("sY: " + mouse.starty,10,110);
 
 	//Draw vector
 	if(mouse.down){
@@ -103,13 +132,22 @@ function updateGame(){
 
 	//Gravity + movement
 	player.yspeed+=gravity;
-	if (player.jumpCountdown!=0)
+	if (player.jumpCountdown>0)
 		player.jumpCountdown--;
 
 	//floor
 	if (player.y>=height - 50 ){
-		if(!player.jumpCountdown>0)
+		if(!player.jumpCountdown>0){
 			player.yspeed=0;
+			player.xspeed=0;
+		}
+	}
+
+	//Roof
+	if (player.y <2 && player.jumpCountdown==0){
+		player.jumpCountdown=5;
+		player.yspeed=-player.yspeed;
+		player.yspeed*=0.20;
 	}
 
 	if (player.x<0)
@@ -136,6 +174,12 @@ var mainloop = function() {
 setInterval( mainloop, ONE_FRAME_TIME );
 
 
+/*
+
+Binds and event listeners. boring stuff
+
+*/
+
 //Bind mouse move
 document.onmousedown = function() {
 	mouse.down=true;
@@ -143,7 +187,7 @@ document.onmousedown = function() {
 	mouse.starty=mouse.y
 }
 document.onmouseup = function() {
-	player.jumpCountdown=30;
+	player.jumpCountdown=0;
 	player.xspeed+=(player.dx / 6 );
 	player.yspeed+=player.dy / 6;
 
@@ -196,7 +240,7 @@ function handleStart(evt) {
 	}
 }
 function handleEnd(evt) {
-	// evt.preventDefault();
+	evt.preventDefault();
 	var touches = evt.changedTouches;
 	document.onmouseup();
 
@@ -211,7 +255,7 @@ function handleEnd(evt) {
 }
 
 function handleMove(evt) {
-	// evt.preventDefault();
+	evt.preventDefault();
 	var el = document.getElementsByTagName("canvas")[0];
 	var ctx = el.getContext("2d");
 	var touches = evt.changedTouches;
@@ -233,7 +277,7 @@ function handleMove(evt) {
 }
 
 function handleCancel(evt) {
-	// evt.preventDefault();
+	evt.preventDefault();
 	console.log("touchcancel.");
 	var touches = evt.changedTouches;
 
