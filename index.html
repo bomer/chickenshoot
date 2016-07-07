@@ -77,8 +77,12 @@ var blocks=[];
 var blockwidth = height*0.3;
 var blockheight = height*0.15;
 
+// var blockType = {  };
+
 var levels=[
-{blocks:[{x:width/2,y:height/2}], goal:{x:width*0.8,y:height-height/10}}
+{blocks:[ {x:width/2,y:height*0.8}],  goal:{x:width*0.8,y:height-height/10}},
+{blocks:[ {x:width/2,y:height/2}, {x:width/2,y:height*0.8}],  goal:{x:width*0.8,y:height-height/10}}
+
 ];
 
 var mouse={};
@@ -96,6 +100,7 @@ function init() {
 	player.turnsLeft=5;
 	player.xspeed=0;
 	player.yspeed=0;
+	player.height=height*0.04;
 	jumpCountdown=0;
 
 	//Level 0, turn this into something better down the line
@@ -103,28 +108,48 @@ function init() {
 
 function drawGame(){
 	var ctx = canvas.getContext("2d");
+	
+
+
+
+
+
+
+	//Draw Blocks
+	var currentlevel=levels[level];
 	//draw Ball
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.beginPath();
-	ctx.arc(player.x,player.y,height*0.05,0,2*Math.PI);
+	
+	//goal
+	ctx.fillStyle="rgba(00, 220, 0, 0.2)";
+	ctx.fillRect(currentlevel.goal.x,currentlevel.goal.y,blockwidth,blockheight);
+	ctx.fillStyle="#000";
+
+
+
+	ctx.arc(player.x,player.y,player.height,0,2*Math.PI);
 	ctx.stroke();
 	ctx.fill();
 
-	// //draw x/y	
-	ctx.font = "16px Arial";
-	ctx.fillText("Turns Left: " + player.turnsLeft,10,50);
-	//Draw Blocks
-	var currentlevel=levels[level];
+
 	for (var i = 0; i < levels[level].blocks.length; i++) {
 		// Create gradient
 		var block = levels[level].blocks[i];		
 		ctx.fillRect(block.x,block.y,blockwidth,blockheight);
 	}
+	// //draw x/y		
+	ctx.font = "16px Arial";
+	ctx.fillText("Turns Left: " + player.turnsLeft,10,50);
+	if (player.locked)
+		ctx.fillText("Locked",10,70);
 
-	//goal
-	ctx.fillStyle="#030";
-	ctx.fillRect(currentlevel.goal.x,currentlevel.goal.y,blockwidth,blockheight);
-	ctx.fillStyle="#000";
+
+//Undo Transform
+	// ctx.setTransform(1, 0, 0, 1, 0, 0);
+	
+
+
 	//Draw vector
 	if(mouse.down){
 		ctx.beginPath();
@@ -134,6 +159,8 @@ function drawGame(){
 		ctx.lineTo(player.x + player.dx,player.y + player.dy);
 		ctx.stroke();
 	}
+
+
 }
 
 function updateGame(){
@@ -161,6 +188,7 @@ function updateGame(){
 		if(!player.jumpCountdown>0){
 			player.yspeed=0;
 			player.xspeed=0;
+			player.y=height -40;
 		}
 	}
 
@@ -168,20 +196,27 @@ function updateGame(){
 	// block detection
 	//
 	var blocks=levels[level].blocks;
-	for (var i = 0; i < blocks.length; i++) {
-		var block = blocks[i];
+	for (var i = 0; i < blocks.length + 1; i++) {
+		if (i == blocks.length){
+			var block = levels[level].goal;
+			block.isGoal=true;
+		}
+		else
+			var block = blocks[i];
 		//Player Hit Detection of blocks, only if jump is not on cooldown
 		if (jumpCountdown==0 && block.visibile!=false){
 			var xdif=player.x-block.x;
 			var ydif=player.y-block.y;				
 			if (xdif >= 0 && xdif <= blockwidth ){ //x and y hit
-				if (ydif>=0 &&  ydif <blockheight ){
-					// console.log("The y IS TRUE");
-					// player.yspeed=blockspeed;
-					// player.yspeed-= (9);
+				if (ydif>=-player.height &&  ydif < blockheight  + player.height){
 					player.xspeed=-player.xspeed;
 					player.yspeed=-player.yspeed;
-					// jumpCountdown=30; //0.5 seconds
+					player.xspeed=0;//.1;
+					player.yspeed=0;//.1;
+
+					if(block.isGoal)
+						player.winner=true;
+
 				}
 			}
 		}
@@ -194,11 +229,19 @@ function updateGame(){
 		player.yspeed*=0.20;
 	}
 
-	if (player.x<0)
-		player.x=width;
-	if (player.x>width)
-		player.x=0;
-	
+	if (player.x<0 + player.height || player.x> (width - player.height)){
+		player.xspeed=-player.xspeed 
+		// player.xspeed*=0.8;
+	}
+		
+	if (player.locked){
+		if(player.xspeed==0 && player.yspeed==0){
+			player.lockcount++;
+			if (player.lockcount>8)
+				player.locked=false;
+		}
+	}
+
 	if (player.dead)
 		init()	
 }
@@ -226,19 +269,38 @@ Binds and event listeners. boring stuff
 
 //Bind mouse move
 document.onmousedown = function() {
-	mouse.down=true;
-	mouse.startx=mouse.x;
-	mouse.starty=mouse.y
+	if (!player.locked){
+		mouse.down=true;
+		mouse.startx=mouse.x;
+		mouse.starty=mouse.y
+	}
 }
 document.onmouseup = function() {
+	if (mouse.down){
 	player.jumpCountdown=0;
-	player.xspeed+=(player.dx / 6 );
-	player.yspeed+=player.dy / 6;
+
+	var maxSpeed = 27;
+	var hyp = player.dx * player.dx + player.dy*player.dy;
+	hyp = Math.sqrt(hyp);
+	var multiplier = maxSpeed/hyp;
+	console.log("hyp = " + hyp);
+	console.log("multi = " + multiplier);
+	console.log("dx = " + player.dx + " and dy : " +player.dy );
+
+	// player.dx *
+	if (multiplier >1)
+		multiplier=1;
+
+	player.xspeed+=(player.dx * multiplier );
+	player.yspeed+=player.dy * multiplier;
 	player.turnsLeft--;
+	player.locked=true;
+	player.lockcount=0;
 
 	mouse.down=false;
 	mouse.startx=null;
 	mouse.starty=null;
+	}
 }
 
 document.onmousemove = function(e) {
@@ -276,11 +338,13 @@ function handleStart(evt) {
 	for (var i = 0; i < touches.length; i++) {
 		console.log("touchstart:" + i + "...");
 		ongoingTouches.push(copyTouch(touches[i])); 
-		mouse.down=true;
-		mouse.startx=touches[i].pageX;
-		mouse.starty=touches[i].pageY; 
-		mouse.x = touches[i].pageX;
-		mouse.y = touches[i].pageY;
+		if (!player.locked){
+			mouse.down=true;
+			mouse.startx=touches[i].pageX;
+			mouse.starty=touches[i].pageY; 
+			mouse.x = touches[i].pageX;
+			mouse.y = touches[i].pageY;
+		}
 
 	}
 }
