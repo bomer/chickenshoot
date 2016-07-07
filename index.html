@@ -102,6 +102,8 @@ function init() {
 	player.yspeed=0;
 	player.height=height*0.04;
 	jumpCountdown=0;
+	player.winCount=0;
+	player.winner=false;
 
 	//Level 0, turn this into something better down the line
 }
@@ -121,10 +123,6 @@ function drawGame(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.beginPath();
 	
-	//goal
-	ctx.fillStyle="rgba(00, 220, 0, 0.2)";
-	ctx.fillRect(currentlevel.goal.x,currentlevel.goal.y,blockwidth,blockheight);
-	ctx.fillStyle="#000";
 
 
 
@@ -148,6 +146,10 @@ function drawGame(){
 //Undo Transform
 	// ctx.setTransform(1, 0, 0, 1, 0, 0);
 	
+	//goal
+	ctx.fillStyle="rgba(00, 220, 0, 0.2)";
+	ctx.fillRect(currentlevel.goal.x - player.winCount,currentlevel.goal.y - player.winCount,blockwidth + player.winCount,blockheight + player.winCount);
+	ctx.fillStyle="#000";
 
 
 	//Draw vector
@@ -164,6 +166,15 @@ function drawGame(){
 }
 
 function updateGame(){
+
+	if (player.winner){
+		player.winCount+=25;
+		console.log(player.winCount);
+	}
+	if (player.winCount>1200){
+		level++;
+		init();
+	}
 	
 	//Calculate key movement for old school keyboards.
 	if (keys[37])	//Left arrow
@@ -214,8 +225,9 @@ function updateGame(){
 					player.xspeed=0;//.1;
 					player.yspeed=0;//.1;
 
-					if(block.isGoal)
+					if(block.isGoal){
 						player.winner=true;
+					}
 
 				}
 			}
@@ -369,7 +381,7 @@ function handleMove(evt) {
 	var ctx = el.getContext("2d");
 	var touches = evt.changedTouches;
 
-	for (var i = 0; i < touches.length; i++) {
+	for (var i = 0; i < touches.length; 	i++) {
     // var color = colorForTouch(touches[i]);
     var idx = ongoingTouchIndexById(touches[i].identifier);
 
