@@ -227,7 +227,7 @@ function updateGame(){
 		if (jumpCountdown==0 && block.visibile!=false){
 			var xdif=player.x-block.x;
 			var ydif=player.y-block.y;				
-			if (xdif >= 0 && xdif <= blockwidth ){ //x and y hit
+			if (xdif >= -player.height && xdif <= blockwidth ){ //x and y hit
 				if (ydif>=-player.height &&  ydif < blockheight  + player.height){
 					player.xspeed=-player.xspeed;
 					player.yspeed=-player.yspeed;
@@ -319,7 +319,7 @@ document.onmouseup = function() {
 	if (mouse.down){
 	player.jumpCountdown=0;
 
-	var maxSpeed = height*0.4;
+	var maxSpeed = height*0.33;
 	var hyp = player.dx * player.dx + player.dy*player.dy;
 	hyp = Math.sqrt(hyp);
 	var multiplier = maxSpeed/hyp;
