@@ -80,7 +80,7 @@ var blockheight = height*0.15;
 // var blockType = {  };
 
 var levels=[
-{blocks:[ {x:width/2,y:height*0.8}],  goal:{x:width*0.8,y:height-height/10}},
+{blocks:[ {x:width/2,y:height*0.8}],  goal:{x:width*0.85,y:height-height/9}},
 {blocks:[ {x:width/2,y:height/2}, {x:width/2,y:height*0.8}],  goal:{x:width*0.8,y:height-height/10}}
 
 ];
@@ -148,7 +148,7 @@ function drawGame(){
 	
 	//goal
 	ctx.fillStyle="rgba(00, 220, 0, 0.2)";
-	ctx.fillRect(currentlevel.goal.x - player.winCount,currentlevel.goal.y - player.winCount,blockwidth + player.winCount,blockheight + player.winCount);
+	ctx.fillRect(currentlevel.goal.x - player.winCount,currentlevel.goal.y - player.winCount,blockwidth + player.winCount ,blockheight + player.winCount);
 	ctx.fillStyle="#000";
 
 
@@ -168,10 +168,10 @@ function drawGame(){
 function updateGame(){
 
 	if (player.winner){
-		player.winCount+=25;
+		player.winCount+=35;
 		console.log(player.winCount);
 	}
-	if (player.winCount>1200){
+	if (player.winCount>1500){
 		level++;
 		init();
 	}
@@ -199,7 +199,7 @@ function updateGame(){
 		if(!player.jumpCountdown>0){
 			player.yspeed=0;
 			player.xspeed=0;
-			player.y=height -40;
+			player.y=height -50;
 		}
 	}
 
@@ -249,13 +249,15 @@ function updateGame(){
 	if (player.locked){
 		if(player.xspeed==0 && player.yspeed==0){
 			player.lockcount++;
-			if (player.lockcount>8)
+			if (player.lockcount>8){
 				player.locked=false;
+				if (player.turnsLeft==0)
+					init()	
+			}
 		}
 	}
 
-	if (player.dead)
-		init()	
+	
 }
 
 init()
@@ -291,7 +293,7 @@ document.onmouseup = function() {
 	if (mouse.down){
 	player.jumpCountdown=0;
 
-	var maxSpeed = 27;
+	var maxSpeed = height*0.52;
 	var hyp = player.dx * player.dx + player.dy*player.dy;
 	hyp = Math.sqrt(hyp);
 	var multiplier = maxSpeed/hyp;
@@ -300,8 +302,25 @@ document.onmouseup = function() {
 	console.log("dx = " + player.dx + " and dy : " +player.dy );
 
 	// player.dx *
-	if (multiplier >1)
+	if (multiplier>1)
 		multiplier=1;
+	console.log("height =  " + height);
+
+	// multiplier*=0.06 + ((520/height) *0.01);
+	//if height==400 
+	//600 = 
+	//height icnreases by 600 =
+	20 
+	// multiplier*=0.08;
+	if(height>1000)
+		multiplier*=0.06;
+	else if(height>800)
+		multiplier*=0.064;
+	else if(height>600)
+		multiplier*=0.0715;
+	else
+		multiplier*=0.078;
+	// multiplier*=height/17666.666;
 
 	player.xspeed+=(player.dx * multiplier );
 	player.yspeed+=player.dy * multiplier;
