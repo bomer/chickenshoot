@@ -204,11 +204,11 @@ function updateGame(){
 		player.jumpCountdown--;
 
 	//floor
-	if (player.y>=height - 50 ){
+	if (player.y>=height - height*0.05 ){
 		if(!player.jumpCountdown>0){
 			player.yspeed=0;
 			player.xspeed=0;
-			player.y=height -50;
+			player.y=height -height*0.05;
 		}
 	}
 
@@ -319,7 +319,7 @@ document.onmouseup = function() {
 	if (mouse.down){
 	player.jumpCountdown=0;
 
-	var maxSpeed = height*0.55;
+	var maxSpeed = height*0.5;
 	var hyp = player.dx * player.dx + player.dy*player.dy;
 	hyp = Math.sqrt(hyp);
 	var multiplier = maxSpeed/hyp;
@@ -366,7 +366,7 @@ document.onmouseup = function() {
 		// console.log("divy = " + mouse.y/height * 4);
 		var x =  Math.floor(mouse.x/width * 4);
 		var y =  Math.floor(mouse.y/height * 4);
-		level = y*4 + x-1;
+		level = y*4 + x;
 		console.log("going to level - " + level);
 
 		inMenu=false;
