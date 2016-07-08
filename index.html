@@ -81,7 +81,7 @@ var inMenu=true;
 // var blockType = {  };
 
 var levels=[
-{blocks:[ {x:width/2,y:height*0.8}],  goal:{x:width*0.85,y:height-height/9}},
+{blocks:[ {x:width/2,y:height*0.8}, {x:width*0.2,y:height*0.5}],  goal:{x:width*0.85,y:height-height/9}},
 {blocks:[ {x:width/2,y:height/2}, {x:width/2,y:height*0.8}],  goal:{x:width*0.8,y:height-height/10}},
 {blocks:[ {x:width/2,y:height*0.8}],  goal:{x:width*0.85,y:height-height*0.85}},
 {blocks:[ {x:width*0.5,y:height*0.8}, {x:width*0.8,y:height*0.35}, {x:width/2,y:height*0.6}, {x:width*0.2,y:height*0.5},{x:width*0.2,y:height*0.4},{x:width*0.2,y:height*0.3},{x:width*0.2,y:height*0.2},{x:width*0.2,y:height*0.1}],  goal:{x:width*0.8,y:height-height/10}},
@@ -229,10 +229,25 @@ function updateGame(){
 			var ydif=player.y-block.y;				
 			if (xdif >= -player.height && xdif <= blockwidth ){ //x and y hit
 				if (ydif>=-player.height &&  ydif < blockheight  + player.height){
-					player.xspeed=-player.xspeed;
-					player.yspeed=-player.yspeed;
+
 					player.xspeed=0;//.1;
 					player.yspeed=0;//.1;
+					//  if(xdif>0 && ydif <0){ // RIGHT
+					// 	player.x= block.x + blockwidth  + player.height -2;
+					// }
+					//  if (xdif<0){ // Left
+					// 	player.x = block.x - player.height + 2;
+					// }
+					// if(ydif>0){ // Below						
+					// 	player.y= block.y + blockheight  + player.height -2;
+					// }  if (ydif<0){  //Above
+					// 	player.y = block.y - player.height + 2;
+					// }
+
+					// if (player.y<block.y &&  )
+					
+					
+
 
 					if(block.isGoal){
 						player.winner=true;
