@@ -70,7 +70,7 @@ var height = window.innerHeight-3;
 var width=height / (9/16) + 16;
 
 var player={};
-var gravity=.91/2;
+var gravity=height*0.001;
 var keymovepower=0.55;
 var friction = 0.98;
 var blocks=[];
@@ -244,7 +244,7 @@ function updateGame(){
 					// 	player.y = block.y - player.height + 2;
 					// }
 
-					// if (player.y<block.y &&  )
+					// if (player.y<block.y && player   )
 					
 					
 
@@ -347,21 +347,7 @@ document.onmouseup = function() {
 		multiplier=1;
 	console.log("height =  " + height);
 
-	// multiplier*=0.06 + ((520/height) *0.01);
-	//if height==400 
-	//600 = 
-	//height icnreases by 600 =
-	20 
-	// multiplier*=0.08;
-	if(height>1000)
-		multiplier*=0.06;
-	else if(height>800)
-		multiplier*=0.064;
-	else if(height>600)
-		multiplier*=0.0715;
-	else
-		multiplier*=0.078;
-	// multiplier*=height/17666.666;
+	multiplier*=0.08;// + ((520/height) *0.01);
 
 	player.xspeed+=(player.dx * multiplier );
 	player.yspeed+=player.dy * multiplier;
