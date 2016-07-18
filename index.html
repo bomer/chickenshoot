@@ -88,19 +88,28 @@ var levels=[
 {blocks:[ {x:width*0.4,y:height*0.8}],  goal:{x:width*0.8,y:height-height/9}},
 {blocks:[ {x:width*0.5,y:height*0.3}, {x:width*0.4,y:height*0.8}],  goal:{x:width*0.8,y:height*0.55}},
 {blocks:[ {x:width*0.4,y:height*0.8,type:t.bounce}, {x:width*0.8,y:height*0.8,type:t.bounce}],  goal:{x:width*0.85,y:height-height*0.85}},
-{blocks:[ {x:width*0.5,y:height*0.8}, {x:width*0.8,y:height*0.35}, {x:width/2,y:height*0.6}, {x:width*0.2,y:height*0.5},{x:width*0.2,y:height*0.4},{x:width*0.2,y:height*0.3},{x:width*0.2,y:height*0.2},{x:width*0.2,y:height*0.1}],  goal:{x:width*0.8,y:height-height/10}},
+{blocks:[ // Level 4
+	{x:width*0.65,y:height*0.8},
+	{x:width*0.65,y:height*0.6},
+	// {x:width*0.8,y:height*0.35},
+	// {x:width*0.2,y:height*0.5},
+	{x:width*0.2,y:height*0.4},
+	{x:width*0.2,y:height*0.3},
+	{x:width*0.2,y:height*0.2},
+	{x:width*0.2,y:height*0.1}],
+	goal:{x:width*0.83,y:height-height/10}},
 
-{blocks:[ {x:width*0.3,y:height*0.3}, // 5, black bounce trap
+{blocks:[ {x:width*0.5,y:height*0.3}, // 5, black bounce trap
 	{x:width*0.4,y:height*0.3},
 	{x:width*0.5,y:height*0.3},
-	{x:width*0.15,y:height*0.3},
-	{x:width*0.15,y:height*0.1},
+	// {x:width*0.15,y:height*0.3},
+	// {x:width*0.15,y:height*0.1},
 	{x:width*0.6,y:height*0.3} ,
 	{x:width*0.2,y:height*0.9},
 	{x:width*0.3,y:height*0.7},
 	{x:width*0.4,y:height*0.7},
 	{x:width *0.5,y:height*0.7},
-	{x:width*0.15,y:height*0.7}],
+	{x:width*0.5,y:height*0.7}],
 	goal:{x:width*0.8,y:height-height/10}},
 {blocks:[ {x:width*0.4,y:height*0.8}, //6 bouncy level
 	{x:width*0.2,y:height*0.4, type:t.bounce},
@@ -114,11 +123,11 @@ var levels=[
 	{x:width*0.2,y:height*0.5},
 	{x:width*0.4,y:height*0.5, type:t.bounce},
 	{x:width*0.6,y:height*0.5},
-	{x:width*0.7,y:height*0.5},
-	{x:width*0.7,y:height*0.6},
-	// {x:width*0.7,y:height*0.7},
-	{x:width*0.7,y:height*0.4},
-	{x:width*0.7,y:height*0.3},
+	{x:width*0.55,y:height*0.5},
+	// {x:width*0.55,y:height*0.6},
+	// {x:width*0.55,y:height*0.7},
+	{x:width*0.55,y:height*0.4},
+	{x:width*0.55,y:height*0.3},
 	],
 	goal:{x:width*0.2,y:height*0.85}}, 
 ];
@@ -179,8 +188,8 @@ function drawGame(){
 	ctx.fillStyle="rgba(237, 219, 206, 1.0)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-ctx.fillStyle="rgba(0, 0, 200, 0.15)";
-	ctx.arc(player.x,player.y,player.height,0,2*Math.PI);
+// ctx.fillStyle="rgba(0, 0, 200, 0.15)";
+	// ctx.arc(player.x,player.y,player.height,0,2*Math.PI);
 	ctx.drawImage(sprites[currentSprite].image,player.x - (player.height) ,player.y - player.height,player.height * 2,player.height * 2);
 	ctx.stroke();
 	ctx.fill();	
@@ -217,11 +226,15 @@ ctx.fillStyle="rgba(0, 0, 200, 0.15)";
 	//Draw vector
 	if(mouse.down){
 		ctx.beginPath();
+		ctx.lineWidth=6;
 		ctx.moveTo(player.x,player.y)
 		player.dx=mouse.startx-mouse.x;
 		player.dy=mouse.starty-mouse.y;
+		canvas_arrow(ctx,player.x,player.y,player.x + player.dx,player.y + player.dy);
+
 		ctx.lineTo(player.x + player.dx,player.y + player.dy);
 		ctx.stroke();
+		ctx.lineWidth=1;
 	}
 
 	//draw win screen
@@ -229,6 +242,8 @@ ctx.fillStyle="rgba(0, 0, 200, 0.15)";
 		if (mouse.down){ //advance level on click
 			level++;
 			init();
+			
+						setTimeout(function(){ player.turnsLeft=5; }, 100);
 		}
 		ctx.fillStyle="#fff";
 		ctx.fillRect(width*0.1,height*0.1,width*0.8,height*0.8);
@@ -348,7 +363,7 @@ function updateGame(){
 					} 
 					else if (checkLineIntersection(px, py, bx, by, block.x+blockwidth, block.y, block.x+blockwidth , block.y+blockheight).onLine2 && xdif > 0) { // Right border and to right
 						console.log("Collision with RIGHT");
-						player.x = block.x + blockwidth ;
+						player.x = block.x + blockwidth+5;
 						currentSprite=5;
 						if(bounce)player.xspeed*=-1;
 						// PROBLEM here
@@ -372,7 +387,7 @@ function updateGame(){
 						if (score>3)
 							score=3;
 						if (score > localStorage.getItem(starstring))
-							localStorage.setItem(starstring,score);						
+							localStorage.setItem(starstring,score);	
 					}
 
 				}
@@ -409,11 +424,24 @@ function updateGame(){
 function drawMenu(){
 	var ctx = canvas.getContext("2d");
 	ctx.textAlign="center";
-	for (var x = 0; x < 5; x++) {
+	var possibleScores=[ "", "*" , "* *", "* * *"];
+	for (var x = 0; x < 4; x++) {
 		for (var y = 0; y < 4; y++) {
-		ctx.roundRect(width/4 * x + width/20, height/4 * y + height/20, width/6, height/6, 20).stroke();
-		ctx.font = height/9+"px Arial";
-		ctx.fillText(y *  4 + (x+1) ,width/4 * x + width*0.13	, height/4*y + width*0.10);
+			ctx.roundRect(width/4 * x + width/20, height/4 * y + height/20, width/6, height/6, 20).stroke();
+			ctx.font = height/9+"px Arial";
+			if(levels[x  +  (y * 4)]){
+				ctx.fillText(y *  4 + (x+1) ,width/4 * x + width*0.13	, height/4*y + width*0.10);
+				var stringlevel = "stars" + (y * 4 + (x));
+				console.log(stringlevel);
+				var score = localStorage.getItem(stringlevel)
+				if (score){
+					ctx.font = height/20+"px Arial";
+
+					ctx.fillText(possibleScores[score]  ,width * 0.25 * (x) + width*0.135 ,height/4 * y + height * 0.22);
+				}
+
+					
+			}
 		}
 	}
 
@@ -596,6 +624,18 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   this.arcTo(x,   y,   x+w, y,   r);
   this.closePath();
   return this;
+}
+
+function canvas_arrow(context, fromx, fromy, tox, toy){
+	var headlen = height*0.1;	// length of head in pixels
+	var dx = tox-fromx;
+	var dy = toy-fromy;
+	var angle = Math.atan2(dy,dx);
+	context.moveTo(fromx, fromy);
+	context.lineTo(tox, toy);
+	context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
+	context.moveTo(tox, toy);
+	context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
 }
 
 // Code from http://jsfiddle.net/justin_c_rounds/Gd2S2/
