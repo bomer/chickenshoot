@@ -88,7 +88,19 @@ var levels=[
 {blocks:[ {x:width*0.4,y:height*0.8}],  goal:{x:width*0.8,y:height-height/9}},
 {blocks:[ {x:width*0.5,y:height*0.3}, {x:width*0.4,y:height*0.8}],  goal:{x:width*0.8,y:height*0.55}},
 {blocks:[ {x:width*0.4,y:height*0.8,type:t.bounce}, {x:width*0.8,y:height*0.8,type:t.bounce}],  goal:{x:width*0.85,y:height-height*0.85}},
-{blocks:[ // Level 4
+{startheight:0.2,blocks:[//4
+	{x:width*0.25,y:height*0.8}, //left bit
+	{x:width*0.45,y:height*0.6},
+	{x:width*0.65,y:height*0.55}], 
+	goal:{x:width*0.8,y:height-height/9}},
+{startheight:0.2,
+	blocks:[//5
+	{x:width*0.05,y:height*0.3},
+	{x:width*0.25,y:height*0.3}, 
+	{x:width*0.45,y:height*0.3},
+	{x:width*0.65,y:height*0.3}], 
+	goal:{x:width*0.3,y:height-height/9}},  
+{blocks:[ // 6
 	{x:width*0.65,y:height*0.8},
 	{x:width*0.65,y:height*0.6},
 	// {x:width*0.8,y:height*0.35},
@@ -111,14 +123,14 @@ var levels=[
 	{x:width *0.5,y:height*0.7},
 	{x:width*0.5,y:height*0.7}],
 	goal:{x:width*0.8,y:height-height/10}},
-{blocks:[ {x:width*0.4,y:height*0.8}, //6 bouncy level
+{startheight:0.2,blocks:[ {x:width*0.4,y:height*0.8}, //6 bouncy level
 	{x:width*0.2,y:height*0.4, type:t.bounce},
 	{x:width*0.7,y:height*0.4, type:t.bounce},
 	{x:width*0.01,y:height*0.3},
 	{x:width*0.9,y:height*0.3}],
  	goal:{x:width*0.85,y:height-height*0.85}
 },
-{blocks:[  // 7
+{ startheight:0.2,blocks:[  // 8
 	{x:width*0.0,y:height*0.5},
 	{x:width*0.2,y:height*0.5},
 	{x:width*0.4,y:height*0.5, type:t.bounce},
@@ -129,7 +141,35 @@ var levels=[
 	{x:width*0.55,y:height*0.4},
 	{x:width*0.55,y:height*0.3},
 	],
-	goal:{x:width*0.2,y:height*0.85}}, 
+	goal:{x:width*0.2,y:height*0.85}},
+{blocks:[//9
+	{x:width*0.18,y:height*0.2}, //left bit
+	{x:width*0.4,y:height*0.2},//middle col
+	{x:width*0.4,y:height*0.4},
+	{x:width*0.4,y:height*0.6},
+	{x:width*0.4,y:height*0.8},
+	], 
+	goal:{x:width*0.8,y:height-height/9}}, 
+{blocks:[//10
+	{x:width*0.18,y:height*0.7}, //left bit
+	{x:width*0.4,y:height*0.2},//middle col
+	{x:width*0.5,y:height*0.4},
+	{x:width*0.6,y:height*0.6},
+	{x:width*0.4,y:height*0.8},
+	], 
+	goal:{x:width*0.8,y:height-height/9}}, 
+{blocks:[//12
+	{x:width*0.1,y:height*0.9, }, //left bit
+	{x:width*0.4,y:height*0.8, type:t.bounce},
+	
+	{x:width*0.6,y:height*0.0},
+	{x:width*0.6,y:height*0.5, type:t.bounce},
+	{x:width*0.4,y:height*0.4, type:t.bounce},
+	{x:width*0.2,y:height*0.4, type:t.bounce},
+	{x:width*0.0,y:height*0.4, type:t.bounce},
+	], 
+	goal:{x:width*0.0,y:height*0.0}}, 
+
 ];
 
 var mouse={};
@@ -156,7 +196,12 @@ function init() {
 	}
 
 	player.x=width/10; //Init player
-	player.y=80;
+	if(levels[level].startheight){
+		console.log("alt start point!");
+		player.y=height*(levels[level].startheight);
+	}
+	else
+		player.y=height*0.67;
 	player.turnsLeft=5;
 	player.xspeed=0;
 	player.yspeed=0;
@@ -242,7 +287,7 @@ function drawGame(){
 		if (mouse.down){ //advance level on click
 			level++;
 			init();
-			
+
 						setTimeout(function(){ player.turnsLeft=5; }, 100);
 		}
 		ctx.fillStyle="#fff";
