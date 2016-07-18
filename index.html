@@ -16,6 +16,11 @@
 
 	<title>Chicken Fling</title>
 
+	<meta property="og:title" content="Chicken Fling"/>
+	<meta property="og:site_name" content="Chicken Fling"/>
+	<meta property="og:description" content="Fling Chuck the Chicken at the goal area!"/>
+	<meta property="og:image" content="https://chickenfling.herokuapp.com/meta/screenshot.png"/>
+
 	<style>
 		html,body{
 			margin:0;
@@ -196,12 +201,14 @@ function init() {
 	}
 
 	player.x=width/10; //Init player
-	if(levels[level].startheight){
-		console.log("alt start point!");
-		player.y=height*(levels[level].startheight);
+	if(levels[level]){
+		if(levels[level].startheight){
+			console.log("alt start point!");
+			player.y=height*(levels[level].startheight);
+		}
+		else
+			player.y=height*0.67;
 	}
-	else
-		player.y=height*0.67;
 	player.turnsLeft=5;
 	player.xspeed=0;
 	player.yspeed=0;
